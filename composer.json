@@ -11,7 +11,7 @@
   "require":
   {
     "silverstripe/framework": "^5",
-    "silverstripe/mailer": "^2.0",  
+
     "aws/aws-sdk-php": "~3.0",
     "symbiote/silverstripe-queuedjobs": "^5.0" 
   },
