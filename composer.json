@@ -10,12 +10,12 @@
   }],
   "require":
   {
-    "silverstripe/framework": "^4",
+    "silverstripe/framework": "^5",
     "aws/aws-sdk-php": "~3.0"
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "4.x-dev"
+      "dev-master": "5.x-dev"
     }
   },
   "autoload": {
