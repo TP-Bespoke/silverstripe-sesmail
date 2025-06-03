@@ -4,8 +4,7 @@ namespace Symbiote\SilverStripeSESMailer\Mail;
 
 use Aws\Ses\SesClient;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Mail\Mailer; // Updated namespace
-use SilverStripe\Mail\Email;   // Updated namespace
+use SilverStripe\Control\Email\Email;
 use Exception;
 use Psr\Log\LoggerInterface;
 use SilverStripe\Core\Config\Config; // Added for SilverStripe 5 config access
@@ -15,6 +14,7 @@ use SilverStripe\Core\Config\Config; // Added for SilverStripe 5 config access
 // or you'll adjust them based on your QueuedJobs module version.
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 use Symbiote\SilverStripeSESMailer\Jobs\SESQueuedMail; // Assuming this is your queued job class
+use SilverStripe\Mailer\Mailer; // Updated for SilverStripe 5
 
 
 /**
