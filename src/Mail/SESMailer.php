@@ -43,7 +43,7 @@ class SESMailer implements Mailer
 	 */
 	public function __construct($config)
 	{
-		$this->client = SesClient::factory($config);
+        $this->client = new SesClient($config);
 	}
 
 	/**
