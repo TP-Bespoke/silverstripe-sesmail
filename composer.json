@@ -1,5 +1,5 @@
 {
-  "name": "symbiote/silverstripe-sesmail",
+  "name": "tp-bespoke/silverstripe-sesmail",
   "description": "Custom Mailer type that sends mail via Amazon's SES",
   "type": "silverstripe-vendormodule",
   "keywords": ["silverstripe", "email", "amazon", "ses"],
