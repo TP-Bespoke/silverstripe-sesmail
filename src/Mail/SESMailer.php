@@ -4,17 +4,20 @@ namespace Symbiote\SilverStripeSESMailer\Mail;
 
 use Aws\Ses\SesClient;
 use SilverStripe\Core\Injector\Injector;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use SilverStripe\Control\Email\Email;
 use Exception;
 use Psr\Log\LoggerInterface;
 use SilverStripe\Core\Config\Config; // Added for SilverStripe 5 config access
+use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mailer\Envelope;
 
 // Assuming QueuedJobService and SESQueuedMail are compatible or will be updated
 // for SilverStripe 5 and their namespaces remain as they are,
 // or you'll adjust them based on your QueuedJobs module version.
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 use Symbiote\SilverStripeSESMailer\Jobs\SESQueuedMail; // Assuming this is your queued job class
-use SilverStripe\Mailer\Mailer; // Updated for SilverStripe 5
 
 
 /**
@@ -25,13 +28,17 @@ use SilverStripe\Mailer\Mailer; // Updated for SilverStripe 5
  *
  * Does not support inline images.
  */
-class SESMailer implements Mailer
+class SESMailer implements MailerInterface
 {
-
     /**
      * @var SesClient
      */
     protected $client;
+
+    /**
+     * @var MailerInterface
+     */
+    protected $mailer;
 
     /**
      * Uses QueuedJobs module when sending emails
@@ -47,10 +54,12 @@ class SESMailer implements Mailer
 
     /**
      * @param array $config
+     * @param TransportInterface $transport
      */
-    public function __construct($config)
+    public function __construct($config, TransportInterface $transport)
     {
         $this->client = new SesClient($config);
+        $this->mailer = new \Symfony\Component\Mailer\Mailer($transport);
     }
 
     /**
@@ -74,13 +83,32 @@ class SESMailer implements Mailer
     }
 
     /**
+     * Symfony MailerInterface method
+     *
+     * @param RawMessage $message
+     * @param Envelope|null $envelope
+     */
+    public function send(RawMessage $message, ?Envelope $envelope = null): void
+    {
+        // If you want to use SES for all mail, you can adapt this logic as needed.
+        // For now, we'll use the SES client to send the raw message.
+        $rawMessageText = $message->toString();
+        $destinations = [];
+        if ($envelope) {
+            $destinations = array_merge($envelope->getTo(), $envelope->getCc() ?? [], $envelope->getBcc() ?? []);
+            $destinations = array_map(function($address) { return $address->getAddress(); }, $destinations);
+        }
+        $this->sendSESClient($destinations, $rawMessageText);
+    }
+
+    /**
+     * SilverStripe compatibility method for sending Email objects
+     *
      * @param Email $email
      * @return bool
      */
-    public function send(Email $email)
+    public function sendSilverStripeEmail(Email $email)
     {
-        // In SilverStripe 5, Email::getTo(), getCc(), getBcc() return an array of ['email' => 'name']
-        // We need just the email addresses for SES.
         $destinations = array_keys($email->getTo());
 
         // Handling send all emails to / override
